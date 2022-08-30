@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      /* ---- reset ---- */
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      #particles-js {
+        width: 100vw;
+        height: 100vh;
+        background-color: #316cd2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #container {
+        position: absolute;
+        width: 400px;
+        height: 600px;
+        border-radius: 13px;
+        display: flex;
+        flex-direction: column;
+      }
+      .border {
+        border: 1px solid #bababa;
+      }
+      #col1 {
+        background-color: #4c4c4c;
+        color: #bbbbbb;
+        font-size: 34px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding-left: 30px;
+        padding-right: 30px;
+        flex: 0.3;
+        border-top-left-radius: 13px;
+        border-top-right-radius: 13px;
+      }
+      #col1_box {
+        width: 380px;
+        height: 50px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        overflow: auto;
+      }
+      #col6-row1 {
+        border-bottom-left-radius: 13px;
+      }
+      #col6-row3 {
+        border-bottom-right-radius: 13px;
+      }
+      #col2,
+      #col3,
+      #col4,
+      #col5,
+      #col6 {
+        display: flex;
+        flex: 0.14;
+        font-size: 26px;
+      }
+      .flex_75 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex: 0.77;
+      }
+      .flex_50 {
+        flex: 0.51;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .flex_25 {
+        flex: 0.25;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .gray {
+        background-color: #e0e0e0;
+        color: #494949;
+      }
+      .orange {
+        background-color: #e89650;
+        color: white;
+      }
+      .btn:active {
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="particles-js">
+      <div id="container">
+        <div id="col1" class="border">
+          <div id="col1_box">0</div>
+        </div>
+        <div id="col2">
+          <div id="col2-row1" class="init border flex_75 gray btn">AC</div>
+          <div id="col2-row2" class="operator border flex_25 orange btn">÷</div>
+        </div>
+        <div id="col3">
+          <div id="col3-row1" class="num border flex_25 gray btn">7</div>
+          <div id="col3-row2" class="num border flex_25 gray btn">8</div>
+          <div id="col3-row3" class="num border flex_25 gray btn">9</div>
+          <div id="col3-row4" class="operator border flex_25 orange btn">×</div>
+        </div>
+        <div id="col4">
+          <div id="col4-row1" class="num border flex_25 gray btn">4</div>
+          <div id="col4-row2" class="num border flex_25 gray btn">5</div>
+          <div id="col4-row3" class="num border flex_25 gray btn">6</div>
+          <div id="col4-row4" class="operator border flex_25 orange btn">-</div>
+        </div>
+        <div id="col5">
+          <div id="col5-row1" class="num border flex_25 gray btn">1</div>
+          <div id="col5-row2" class="num border flex_25 gray btn">2</div>
+          <div id="col5-row3" class="num border flex_25 gray btn">3</div>
+          <div id="col5-row4" class="operator border flex_25 orange btn">+</div>
+        </div>
+        <div id="col6">
+          <div id="col6-row1" class="num border flex_50 gray btn">0</div>
+          <div id="col6-row2" class="dot border flex_25 gray btn">.</div>
+          <div id="col6-row3" class="enter border flex_25 orange btn">=</div>
+        </div>
+      </div>
+    </div>
+
+    <script src="http://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <!-- stats.js lib -->
+    <script src="http://threejs.org/examples/js/libs/stats.min.js"></script>
+    <script>
+      let btn = document.querySelectorAll(".btn");
+      let result = document.querySelector("#col1_box");
+      let firstNum, previousKey, operator;
+
+      btn.forEach((target) => {
+        target.addEventListener("click", (event) => {
+          let ele = event.target;
+          let action = ele.classList[0];
+          let btnContent = ele.textContent;
+
+          if (action === "num") {
+            if (previousKey === "operator") {
+              result.textContent = btnContent;
+              previousKey = "num";
+            } else {
+              if (result.textContent === "0") {
+                result.textContent = btnContent;
+              } else {
+                result.textContent += btnContent;
+              }
+            }
+          } else if (action === "operator") {
+            operator = btnContent;
+            previousKey = "operator";
+            firstNum = Number(result.textContent);
+          } else if (action === "dot") {
+            if (result.textContent.includes(".")) {
+              result.textContent += "";
+            } else {
+              result.textContent += btnContent;
+            }
+          } else if (action === "init") {
+            result.textContent = "0";
+            previousKey = "";
+            firstNum = 0;
+            operator = "";
+          } else if (action === "enter") {
+            result.textContent = calculate(
+              firstNum,
+              operator,
+              Number(result.textContent)
+            );
+          }
+        });
+      });
+
+      function calculate(n1, operator, n2) {
+        let result;
+
+        if (operator === "+") {
+          result = n1 + n2;
+        } else if (operator === "-") {
+          result = n1 - n2;
+        } else if (operator === "×") {
+          result = n1 * n2;
+        } else if (operator === "÷") {
+          result = n1 / n2;
+        }
+
+        return String(result);
+      }
+
+      // let btn = document.querySelectorAll(".btn");
+      // let result = document.querySelector("#col1_box");
+
+      // btn.forEach((target) => {
+      //   target.addEventListener("click", (event) => {
+      //     let ele = event.target;
+      //     let action = ele.classList[0];
+      //     let btnContent = ele.textContent;
+      //     let numex = "0123456789";
+      //     let firstnum = result.innerHTML.substring(0, 1);
+      //     let lastnum = result.innerHTML.slice(-1);
+
+      //     if (action === "num") {
+      //       if (firstnum === "0") {
+      //         result.innerHTML = "";
+      //       } else if (
+      //         lastnum === "+" ||
+      //         lastnum === "-" ||
+      //         lastnum === "×" ||
+      //         lastnum === "÷"
+      //       ) {
+      //         result.innerHTML += " ";
+      //       }
+      //       result.innerHTML += btnContent;
+      //     } else if (action === "operator") {
+      //       result.innerHTML += " " + btnContent;
+      //     } else if (action === "dot") {
+      //       if (numex.includes(lastnum)) {
+      //         result.innerHTML += btnContent;
+      //       } else {
+      //         result.innerHTML += "";
+      //       }
+      //     }
+
+      //     if (action === "init") {
+      //       result.innerHTML = "0";
+      //     }
+      //   });
+      // });
+
+      // particlejs
+      particlesJS("particles-js", {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: "#ffffff" },
+          shape: {
+            type: "circle",
+            stroke: { width: 0, color: "#000000" },
+            polygon: { nb_sides: 5 },
+            image: { src: "img/github.svg", width: 100, height: 100 },
+          },
+          opacity: {
+            value: 0.5,
+            random: false,
+            anim: { enable: false, speed: 1, opacity_min: 0.1, sync: false },
+          },
+          size: {
+            value: 3,
+            random: true,
+            anim: { enable: false, speed: 40, size_min: 0.1, sync: false },
+          },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: "#ffffff",
+            opacity: 0.4,
+            width: 1,
+          },
+          move: {
+            enable: true,
+            speed: 6,
+            direction: "none",
+            random: false,
+            straight: false,
+            out_mode: "out",
+            bounce: false,
+            attract: { enable: false, rotateX: 600, rotateY: 1200 },
+          },
+        },
+        interactivity: {
+          detect_on: "canvas",
+          events: {
+            onhover: { enable: true, mode: "repulse" },
+            onclick: { enable: true, mode: "push" },
+            resize: true,
+          },
+          modes: {
+            grab: { distance: 400, line_linked: { opacity: 1 } },
+            bubble: {
+              distance: 400,
+              size: 40,
+              duration: 2,
+              opacity: 8,
+              speed: 3,
+            },
+            repulse: { distance: 200, duration: 0.4 },
+            push: { particles_nb: 4 },
+            remove: { particles_nb: 2 },
+          },
+        },
+        retina_detect: true,
+      });
+      var count_particles, update;
+
+      count_particles = document.querySelector(".js-count-particles");
+      update = function () {
+        if (
+          window.pJSDom[0].pJS.particles &&
+          window.pJSDom[0].pJS.particles.array
+        ) {
+          count_particles.innerText =
+            window.pJSDom[0].pJS.particles.array.length;
+        }
+        requestAnimationFrame(update);
+      };
+      requestAnimationFrame(update);
+    </script>
+  </body>
+</html>
